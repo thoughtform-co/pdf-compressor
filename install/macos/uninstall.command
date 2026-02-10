@@ -20,6 +20,7 @@ echo ""
 APP_SUPPORT_DIR="$HOME/Library/Application Support/PDF Compressor"
 SERVICES_DIR="$HOME/Library/Services"
 WORKFLOW_NAME="Compress PDF to 30MB.workflow"
+APP_BUNDLE="$HOME/Applications/PDF Compressor.app"
 
 removed=0
 
@@ -42,9 +43,20 @@ else
     echo "Quick Action not found (already removed)."
 fi
 
+if [ -d "$APP_BUNDLE" ]; then
+    echo "Removing Finder app integration..."
+    rm -rf "$APP_BUNDLE"
+    echo "  Removed: $APP_BUNDLE"
+    removed=$((removed + 1))
+else
+    echo "Finder app integration not found (already removed)."
+fi
+
 echo ""
 echo "Refreshing Services menu..."
 /System/Library/CoreServices/pbs -flush 2>/dev/null || true
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain user -domain local -domain system 2>/dev/null || true
+killall Finder 2>/dev/null || true
 
 echo ""
 echo "========================================"
