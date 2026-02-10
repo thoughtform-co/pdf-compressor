@@ -107,7 +107,7 @@ elif is_macos:
         console=True,
         disable_windowed_traceback=False,
         argv_emulation=False,
-        target_arch='universal2',  # Intel + Apple Silicon
+        target_arch=None,  # Build for native arch (arm64 on Apple Silicon runners)
         codesign_identity=None,  # Ad-hoc signing by default
         entitlements_file=None,
     )
