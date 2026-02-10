@@ -1,0 +1,25 @@
+# Build macOS release zip so users can download from Actions artifacts.
+# Run on push to master. Download: Actions → latest "Build macOS zip" run → Artifacts → pdf-compressor-macos.zip
+
+name: Build macOS zip
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and package
+        run: |
+          chmod +x scripts/build-macos.sh scripts/package-macos.sh
+          ./scripts/package-macos.sh
+
+      - name: Upload zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-compressor-macos
+          path: dist/pdf-compressor-macos.zip

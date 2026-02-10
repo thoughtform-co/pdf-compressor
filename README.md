@@ -25,8 +25,10 @@ A cross-platform PDF compression tool with **right-click menu integration** for 
 ### macOS
 
 1. **Download** the latest release (`pdf-compressor-macos.zip`)
-2. **Extract** and double-click `install/macos/install.command`
-3. **Right-click** any PDF → Quick Actions → "Compress PDF to 30MB"
+2. **Extract** the zip (you get a folder `pdf-compressor-macos`)
+3. Open that folder and **double-click** `install.command`
+4. If macOS blocks it: right-click `install.command` → **Open** → **Open**
+5. **Right-click** any PDF in Finder → **Quick Actions** → "Compress PDF to 30MB"
 
 ---
 
@@ -81,20 +83,30 @@ cd "PDF Compressor"
 
 ### macOS
 
+Build and install locally:
+
 ```bash
 # Clone or download the repository
 cd "PDF Compressor"
 
-# Make build script executable
-chmod +x scripts/build-macos.sh
+chmod +x scripts/build-macos.sh scripts/package-macos.sh
 
 # Build the executable
 ./scripts/build-macos.sh
 
-# Make installer executable and run
-chmod +x install/macos/install.command
+# Install Quick Action (binary + workflow)
 ./install/macos/install.command
 ```
+
+Create a release zip (for sharing with other Mac users):
+
+```bash
+./scripts/package-macos.sh
+# Output: dist/pdf-compressor-macos.zip
+# Zip contains: install.command, uninstall.command, pdf-compress, Quick Action workflow, README
+```
+
+**Release verification (on macOS):** Extract the zip, double-click `install.command`, then right-click a PDF in Finder → Quick Actions → "Compress PDF to 30MB" and confirm `<name>.compressed.pdf` is created. Run `uninstall.command` and confirm the Quick Action is removed.
 
 ### Development (without building)
 
@@ -167,11 +179,13 @@ This adds "Compress PDF to 30MB" to the right-click menu for all PDF files, rega
 
 ### macOS Quick Action
 
-The installer copies:
-- Binary to `~/Library/Application Support/PDF Compressor/pdf-compress`
-- Workflow to `~/Library/Services/Compress PDF to 30MB.workflow`
+When you run `install.command` (from the release zip or after building), it installs:
+- Binary: `~/Library/Application Support/PDF Compressor/pdf-compress`
+- Quick Action: `~/Library/Services/Compress PDF to 30MB.workflow`
 
-**To uninstall:**
+Compressed files are saved as `<filename>.compressed.pdf` in the same folder as the original.
+
+**To uninstall:** Double-click `uninstall.command` from the same folder you used to install, or run:
 ```bash
 ./install/macos/uninstall.command
 ```
@@ -183,13 +197,15 @@ The installer copies:
 - Or restart Explorer: `taskkill /f /im explorer.exe && start explorer`
 
 **macOS: Quick Action doesn't appear**
-- Go to System Settings → Privacy & Security → Extensions → Finder
-- Ensure "Compress PDF to 30MB" is enabled
-- Or try: `/System/Library/CoreServices/pbs -flush`
+- Go to **System Settings → Privacy & Security → Extensions → Finder**
+- Enable "Compress PDF to 30MB"
+- Or run in Terminal: `/System/Library/CoreServices/pbs -flush`
+- Log out and back in if it still doesn’t show
 
 **macOS: "Cannot be opened because the developer cannot be verified"**
-- The installer clears quarantine automatically
-- If it persists, run: `xattr -dr com.apple.quarantine /path/to/file`
+- Right-click `install.command` → **Open** → **Open** (one-time)
+- The installer also clears quarantine on the binary and workflow
+- If a specific file is blocked: `xattr -dr com.apple.quarantine /path/to/file`
 
 ---
 

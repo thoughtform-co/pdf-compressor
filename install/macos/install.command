@@ -11,7 +11,7 @@
 
 set -e
 
-# Get script directory
+# Get script directory (works when run from Finder or Terminal)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INSTALL_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_ROOT="$(dirname "$INSTALL_DIR")"
@@ -27,11 +27,11 @@ APP_SUPPORT_DIR="$HOME/Library/Application Support/PDF Compressor"
 SERVICES_DIR="$HOME/Library/Services"
 WORKFLOW_NAME="Compress PDF to 30MB.workflow"
 
-# Find the executable
+# Find the executable (prefer same folder as this script for release zip)
 EXE_PATH=""
 SEARCH_PATHS=(
-    "$PROJECT_ROOT/dist/pdf-compress"
     "$SCRIPT_DIR/pdf-compress"
+    "$PROJECT_ROOT/dist/pdf-compress"
     "$PROJECT_ROOT/pdf-compress"
 )
 
@@ -43,35 +43,54 @@ for path in "${SEARCH_PATHS[@]}"; do
 done
 
 if [ -z "$EXE_PATH" ]; then
-    echo "Error: pdf-compress executable not found!"
+    echo "Error: pdf-compress executable not found."
     echo ""
-    echo "Please build it first:"
+    echo "If you built from source, run first:"
     echo "  ./scripts/build-macos.sh"
     echo ""
-    echo "Or place pdf-compress in one of these locations:"
+    echo "If you downloaded the zip, ensure pdf-compress is in the same folder as this installer."
+    echo "Searched:"
     for path in "${SEARCH_PATHS[@]}"; do
         echo "  - $path"
     done
+    echo ""
+    read -p "Press Enter to close..."
     exit 1
 fi
 
+# Ensure source binary is executable
+chmod +x "$EXE_PATH"
 echo "Found executable: $EXE_PATH"
 
-# Create application support directory
+# Create application support directory and install binary
 echo ""
 echo "Installing binary..."
 mkdir -p "$APP_SUPPORT_DIR"
 cp "$EXE_PATH" "$APP_SUPPORT_DIR/pdf-compress"
 chmod +x "$APP_SUPPORT_DIR/pdf-compress"
 
-# Remove quarantine attribute (prevents Gatekeeper issues)
-echo "Clearing quarantine attributes..."
-xattr -dr com.apple.quarantine "$APP_SUPPORT_DIR/pdf-compress" 2>/dev/null || true
+# Remove quarantine attribute (reduces Gatekeeper issues when run from zip)
+echo "Clearing quarantine on binary..."
+if xattr -dr com.apple.quarantine "$APP_SUPPORT_DIR/pdf-compress" 2>/dev/null; then
+    echo "  Quarantine cleared."
+else
+    echo "  (Quarantine clear skipped or not needed.)"
+fi
 
-# Ad-hoc sign the binary if not already signed
+# Ad-hoc sign so macOS allows execution without extra prompts
 echo "Signing binary (ad-hoc)..."
-codesign --force --sign - "$APP_SUPPORT_DIR/pdf-compress" 2>/dev/null || true
+if codesign --force --sign - "$APP_SUPPORT_DIR/pdf-compress" 2>/dev/null; then
+    echo "  Signed successfully."
+else
+    echo "  (Signing skipped; binary may still work.)"
+fi
 
+# Verify installed binary runs
+if ! "$APP_SUPPORT_DIR/pdf-compress" --version &>/dev/null; then
+    echo ""
+    echo "Warning: Installed binary did not run (--version check failed)."
+    echo "You may need to allow it in System Settings → Privacy & Security."
+fi
 echo "  Installed to: $APP_SUPPORT_DIR/pdf-compress"
 
 # Install Quick Action workflow
@@ -79,26 +98,25 @@ echo ""
 echo "Installing Quick Action..."
 WORKFLOW_SRC="$SCRIPT_DIR/$WORKFLOW_NAME"
 
-if [ -d "$WORKFLOW_SRC" ]; then
-    mkdir -p "$SERVICES_DIR"
-    
-    # Remove existing workflow if present
-    if [ -d "$SERVICES_DIR/$WORKFLOW_NAME" ]; then
-        rm -rf "$SERVICES_DIR/$WORKFLOW_NAME"
-    fi
-    
-    cp -R "$WORKFLOW_SRC" "$SERVICES_DIR/"
-    
-    # Clear quarantine on workflow
-    xattr -dr com.apple.quarantine "$SERVICES_DIR/$WORKFLOW_NAME" 2>/dev/null || true
-    
-    echo "  Installed to: $SERVICES_DIR/$WORKFLOW_NAME"
-else
-    echo "  Warning: Workflow not found at $WORKFLOW_SRC"
-    echo "  Quick Action not installed."
+if [ ! -d "$WORKFLOW_SRC" ]; then
+    echo "Error: Quick Action workflow not found at:"
+    echo "  $WORKFLOW_SRC"
+    echo ""
+    echo "The installer archive may be incomplete. Ensure '$WORKFLOW_NAME' is in the same folder as this script."
+    echo ""
+    read -p "Press Enter to close..."
+    exit 1
 fi
 
-# Refresh Services menu
+mkdir -p "$SERVICES_DIR"
+if [ -d "$SERVICES_DIR/$WORKFLOW_NAME" ]; then
+    rm -rf "$SERVICES_DIR/$WORKFLOW_NAME"
+fi
+cp -R "$WORKFLOW_SRC" "$SERVICES_DIR/"
+xattr -dr com.apple.quarantine "$SERVICES_DIR/$WORKFLOW_NAME" 2>/dev/null || true
+echo "  Installed to: $SERVICES_DIR/$WORKFLOW_NAME"
+
+# Refresh Services menu so Finder shows the new Quick Action
 echo ""
 echo "Refreshing Services menu..."
 /System/Library/CoreServices/pbs -flush 2>/dev/null || true
@@ -109,14 +127,15 @@ echo "Installation complete!"
 echo "========================================"
 echo ""
 echo "To use:"
-echo "  1. Right-click any PDF file in Finder"
-echo "  2. Go to Quick Actions (or Services)"
-echo "  3. Select 'Compress PDF to 30MB'"
+echo "  1. Right-click any PDF in Finder"
+echo "  2. Quick Actions (or Services) → 'Compress PDF to 30MB'"
 echo ""
-echo "The compressed file will be saved as <filename>.compressed.pdf"
+echo "Output is saved as <filename>.compressed.pdf in the same folder."
 echo ""
-echo "Note: If the Quick Action doesn't appear immediately,"
-echo "      try logging out and back in, or restart Finder."
+echo "If the Quick Action does not appear:"
+echo "  System Settings → Privacy & Security → Extensions → Finder → enable it"
+echo "  Or log out and back in."
 echo ""
-echo "To uninstall, run: ./uninstall.command"
+echo "To uninstall: run uninstall.command from this folder."
 echo ""
+read -p "Press Enter to close..."

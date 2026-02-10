@@ -107,7 +107,7 @@ elif is_macos:
         console=True,
         disable_windowed_traceback=False,
         argv_emulation=False,
-        target_arch=None,  # Can set to 'universal2' for both Intel and Apple Silicon
+        target_arch='universal2',  # Intel + Apple Silicon
         codesign_identity=None,  # Ad-hoc signing by default
         entitlements_file=None,
     )
