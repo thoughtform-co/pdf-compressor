@@ -1,17 +1,34 @@
 # Build macOS release zip so users can download from Actions artifacts.
-# Run on push to master. Download: Actions → latest "Build macOS zip" run → Artifacts → pdf-compressor-macos.zip
+# Run on push to master. Download: Actions -> latest run -> Artifacts -> pdf-compressor-macos.zip
 
 name: Build macOS zip
 
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fix line endings
+        run: |
+          # Ensure shell scripts have LF endings (in case git checkout used CRLF)
+          if command -v dos2unix &>/dev/null; then
+            dos2unix scripts/build-macos.sh scripts/package-macos.sh install/macos/install.command install/macos/uninstall.command 2>/dev/null || true
+          else
+            for f in scripts/build-macos.sh scripts/package-macos.sh install/macos/install.command install/macos/uninstall.command; do
+              sed -i '' $'s/\r$//' "$f"
+            done
+          fi
 
       - name: Build and package
         run: |
