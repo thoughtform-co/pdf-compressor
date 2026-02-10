@@ -4,7 +4,8 @@
 #
 # Removes:
 #   1. The pdf-compress binary from ~/Library/Application Support/PDF Compressor/
-#   2. The Quick Action workflow from ~/Library/Services/
+#   2. Legacy Quick Action workflow from ~/Library/Services/
+#   3. Finder app integration from ~/Applications/PDF Compressor.app
 #
 # Double-click this file to run, or execute from Terminal.
 #

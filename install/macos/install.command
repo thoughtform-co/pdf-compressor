@@ -15,8 +15,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_SUPPORT_DIR="$HOME/Library/Application Support/PDF Compressor"
 APP_DIR="$HOME/Applications"
 APP_BUNDLE="$APP_DIR/PDF Compressor.app"
-APP_EXE="$APP_BUNDLE/Contents/MacOS/PDF Compressor"
-APP_PLIST="$APP_BUNDLE/Contents/Info.plist"
 INSTALLED_BIN="$APP_SUPPORT_DIR/pdf-compress"
 
 echo ""
@@ -59,78 +57,62 @@ echo "  Installed: $INSTALLED_BIN"
 
 echo ""
 echo "Installing Finder app integration..."
-mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
+TMP_APPLESCRIPT="$(mktemp -t pdf-compressor-XXXXXX.applescript)"
+cat > "$TMP_APPLESCRIPT" <<'APPLESCRIPT'
+on run
+    display notification "Use Open With on a PDF file." with title "PDF Compressor"
+end run
 
-cat > "$APP_PLIST" <<'PLIST'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>CFBundleName</key>
-  <string>PDF Compressor</string>
-  <key>CFBundleDisplayName</key>
-  <string>PDF Compressor</string>
-  <key>CFBundleIdentifier</key>
-  <string>co.thoughtform.pdfcompressor</string>
-  <key>CFBundleVersion</key>
-  <string>1</string>
-  <key>CFBundleShortVersionString</key>
-  <string>1.0</string>
-  <key>CFBundleExecutable</key>
-  <string>PDF Compressor</string>
-  <key>CFBundlePackageType</key>
-  <string>APPL</string>
-  <key>LSMinimumSystemVersion</key>
-  <string>12.0</string>
-  <key>LSUIElement</key>
-  <true/>
-  <key>CFBundleDocumentTypes</key>
-  <array>
-    <dict>
-      <key>CFBundleTypeName</key>
-      <string>PDF Document</string>
-      <key>CFBundleTypeRole</key>
-      <string>Viewer</string>
-      <key>LSHandlerRank</key>
-      <string>Alternate</string>
-      <key>LSItemContentTypes</key>
-      <array>
-        <string>com.adobe.pdf</string>
-      </array>
-    </dict>
-  </array>
-</dict>
-</plist>
-PLIST
+on open droppedItems
+    set compressorPath to POSIX path of (path to home folder) & "Library/Application Support/PDF Compressor/pdf-compress"
 
-cat > "$APP_EXE" <<'LAUNCHER'
-#!/bin/bash
-TARGET_MB=30
-COMPRESSOR="$HOME/Library/Application Support/PDF Compressor/pdf-compress"
+    try
+        do shell script "test -x " & quoted form of compressorPath
+    on error
+        display alert "PDF Compressor not installed correctly" message "Run install.command again."
+        return
+    end try
 
-if [ ! -x "$COMPRESSOR" ]; then
-  osascript -e 'display alert "PDF Compressor not installed correctly" message "Run install.command again."'
-  exit 1
-fi
+    repeat with droppedItem in droppedItems
+        set pdfPath to POSIX path of droppedItem
+        try
+            set fileName to do shell script "basename " & quoted form of pdfPath
+        on error
+            set fileName to "PDF"
+        end try
 
-if [ "$#" -eq 0 ]; then
-  osascript -e 'display notification "No PDF selected." with title "PDF Compressor"'
-  exit 0
-fi
+        try
+            do shell script quoted form of compressorPath & " " & quoted form of pdfPath & " --target-mb 30"
+            display notification "Done: " & fileName with title "PDF Compressor"
+        on error
+            display notification "Failed: " & fileName with title "PDF Compressor"
+        end try
+    end repeat
+end open
+APPLESCRIPT
 
-for pdf in "$@"; do
-  if [ -f "$pdf" ]; then
-    filename=$(basename "$pdf")
-    if "$COMPRESSOR" "$pdf" --target-mb "$TARGET_MB"; then
-      osascript -e "display notification \"Done: $filename\" with title \"PDF Compressor\""
-    else
-      osascript -e "display notification \"Failed: $filename\" with title \"PDF Compressor\""
-    fi
-  fi
-done
-LAUNCHER
+rm -rf "$APP_BUNDLE"
+osacompile -o "$APP_BUNDLE" "$TMP_APPLESCRIPT"
+rm -f "$TMP_APPLESCRIPT"
 
-chmod +x "$APP_EXE"
+APP_PLIST="$APP_BUNDLE/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c "Delete :CFBundleDocumentTypes" "$APP_PLIST" 2>/dev/null || true
+/usr/libexec/PlistBuddy -c "Delete :CFBundleIdentifier" "$APP_PLIST" 2>/dev/null || true
+/usr/libexec/PlistBuddy -c "Delete :CFBundleDisplayName" "$APP_PLIST" 2>/dev/null || true
+/usr/libexec/PlistBuddy -c "Delete :LSUIElement" "$APP_PLIST" 2>/dev/null || true
+
+/usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string co.thoughtform.pdfcompressor" "$APP_PLIST"
+/usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string PDF Compressor" "$APP_PLIST"
+/usr/libexec/PlistBuddy -c "Add :LSUIElement bool true" "$APP_PLIST"
+
+/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes array" "$APP_PLIST"
+/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0 dict" "$APP_PLIST"
+/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeName string PDF Document" "$APP_PLIST"
+/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:CFBundleTypeRole string Viewer" "$APP_PLIST"
+/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:LSHandlerRank string Alternate" "$APP_PLIST"
+/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:LSItemContentTypes array" "$APP_PLIST"
+/usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:LSItemContentTypes:0 string com.adobe.pdf" "$APP_PLIST"
+
 xattr -dr com.apple.quarantine "$APP_BUNDLE" 2>/dev/null || true
 codesign --force --sign - "$APP_BUNDLE" 2>/dev/null || true
 echo "  Installed: $APP_BUNDLE"
