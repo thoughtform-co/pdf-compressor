@@ -4,16 +4,16 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 const CYAN = 0x00d4ff;
-const PARTICLE_COUNT = 4000;
-const BASE_OPACITY = 0.05;
-const ACTIVE_OPACITY = 0.12;
-const FADE_DURATION_MS = 1000;
-const IDLE_ROTATION = 0.008;
-const ACTIVE_ROTATION = 0.02;
-const BREATHE_SPEED = 0.8;
-const BREATHE_AMPLITUDE = 0.05;
+const PARTICLE_COUNT = 4500;
+const BASE_OPACITY = 0.04;
+const ACTIVE_OPACITY = 0.10;
+const FADE_DURATION_MS = 1200;
+const IDLE_ROTATION = 0.006;
+const ACTIVE_ROTATION = 0.018;
+const BREATHE_SPEED = 0.6;
+const BREATHE_AMPLITUDE = 0.04;
 const SCALE_IDLE = 1.0;
-const SCALE_CONTRACTED = 0.7;
+const SCALE_CONTRACTED = 0.72;
 
 interface Point3 {
   x: number;
@@ -21,27 +21,79 @@ interface Point3 {
   z: number;
 }
 
-function generateLorenzPoints(count: number): Point3[] {
-  const points: Point3[] = [];
-  const dt = 0.005;
-  const warmup = 500;
-  const sigma = 10,
-    rho = 28,
-    beta = 8 / 3;
-  let x = 0.1 + Math.random() * 0.1;
-  let y = 0.1 + Math.random() * 0.1;
-  let z = 0.1 + Math.random() * 0.1;
+/* ─── SHAPE GENERATORS ─── */
 
-  for (let i = 0; i < count + warmup; i++) {
-    const dx = sigma * (y - x);
-    const dy = x * (rho - z) - y;
-    const dz = x * y - beta * z;
-    x += dx * dt;
-    y += dy * dt;
-    z += dz * dt;
-    if (i >= warmup) points.push({ x, y, z });
+/** Spiral torus -- twisted donut with flowing arms */
+function generateSpiralTorus(count: number): Point3[] {
+  const points: Point3[] = [];
+  const R = 0.7; // major radius
+  const r = 0.28; // minor radius
+  for (let i = 0; i < count; i++) {
+    const u = (i / count) * Math.PI * 5; // extra wraps for density
+    const v = ((i % 30) / 30) * Math.PI * 2;
+    const twist = u * 0.6;
+    points.push({
+      x: (R + r * Math.cos(v + twist)) * Math.cos(u),
+      y: (R + r * Math.cos(v + twist)) * Math.sin(u),
+      z: r * Math.sin(v + twist),
+    });
   }
-  return normalizePoints(points);
+  return points;
+}
+
+/** Vortex ribbons -- spiraling inward like a compression funnel */
+function generateVortexRibbons(count: number): Point3[] {
+  const points: Point3[] = [];
+  const ribbons = 6;
+  const perRibbon = Math.floor(count / ribbons);
+  for (let s = 0; s < ribbons; s++) {
+    const angleOffset = (s / ribbons) * Math.PI * 2;
+    for (let i = 0; i < perRibbon; i++) {
+      const t = i / perRibbon;
+      const radius = 1.0 - t * 0.7; // spiral inward
+      const angle = angleOffset + t * Math.PI * 6;
+      const height = (t - 0.5) * 1.2;
+      points.push({
+        x: radius * Math.cos(angle),
+        y: height,
+        z: radius * Math.sin(angle),
+      });
+    }
+  }
+  return points;
+}
+
+/** Field lines -- radial curves connecting outer shell to inner core */
+function generateFieldLines(count: number): Point3[] {
+  const points: Point3[] = [];
+  const lines = 20;
+  const perLine = Math.floor(count / lines);
+  for (let l = 0; l < lines; l++) {
+    const theta = (l / lines) * Math.PI * 2;
+    const phi = Math.acos(1 - 2 * ((l * 7 + 3) % lines) / lines); // distributed on sphere
+    for (let i = 0; i < perLine; i++) {
+      const t = i / perLine;
+      const r = 0.2 + (1.0 - 0.2) * (1 - t);
+      const wave = Math.sin(t * Math.PI * 4) * 0.08;
+      points.push({
+        x: r * Math.sin(phi + wave) * Math.cos(theta),
+        y: r * Math.cos(phi + wave),
+        z: r * Math.sin(phi + wave) * Math.sin(theta),
+      });
+    }
+  }
+  return points;
+}
+
+/** Combine all shapes into a single cloud and normalize to [-1, 1] */
+function generateParticleCloud(totalCount: number): Point3[] {
+  const third = Math.floor(totalCount / 3);
+  const raw = [
+    ...generateSpiralTorus(third),
+    ...generateVortexRibbons(third),
+    ...generateFieldLines(totalCount - third * 2),
+  ];
+  return normalizePoints(raw);
 }
 
 function normalizePoints(points: Point3[]): Point3[] {
@@ -63,6 +115,8 @@ function normalizePoints(points: Point3[]): Point3[] {
     z: (p.z - cz) * scale,
   }));
 }
+
+/* ─── COMPONENT ─── */
 
 export function CompressionParticleField({ compressing }: { compressing: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -86,7 +140,7 @@ export function CompressionParticleField({ compressing }: { compressing: boolean
     renderer.setClearColor(0x000000, 0);
     container.appendChild(renderer.domElement);
 
-    const points = generateLorenzPoints(PARTICLE_COUNT);
+    const points = generateParticleCloud(PARTICLE_COUNT);
     const positions = new Float32Array(points.length * 3);
     points.forEach((p, i) => {
       positions[i * 3] = p.x;
@@ -97,7 +151,7 @@ export function CompressionParticleField({ compressing }: { compressing: boolean
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
     const material = new THREE.PointsMaterial({
       color: CYAN,
-      size: 0.04,
+      size: 0.035,
       transparent: true,
       opacity: BASE_OPACITY,
       sizeAttenuation: true,
@@ -118,14 +172,15 @@ export function CompressionParticleField({ compressing }: { compressing: boolean
 
     let animationId: number;
     let rotationY = 0, rotationX = 0;
-    let scaleT = 0;
-    let opacityT = 0;
+    let scaleT = SCALE_IDLE;
+    let opacityT = BASE_OPACITY;
     let visibleT = 0;
 
     const animate = (time: number) => {
       animationId = requestAnimationFrame(animate);
       const isCompressing = compressingRef.current;
 
+      // Fade transition
       const targetVisible = isCompressing ? 1 : 0;
       if (visibleRef.current !== isCompressing) {
         fadeStartRef.current = time;
@@ -133,23 +188,27 @@ export function CompressionParticleField({ compressing }: { compressing: boolean
       }
       const fadeElapsed = time - fadeStartRef.current;
       const fadeProgress = Math.min(fadeElapsed / FADE_DURATION_MS, 1);
-      visibleT += (targetVisible - visibleT) * 0.05;
+      visibleT += (targetVisible - visibleT) * 0.04;
       const fadeMultiplier = targetVisible === 1 ? fadeProgress : 1 - fadeProgress;
-      const displayVisibility = visibleT * fadeMultiplier;
+      const displayVisibility = Math.max(0, visibleT * fadeMultiplier);
 
+      // Scale with breathing
       const targetScale = isCompressing ? SCALE_CONTRACTED : SCALE_IDLE;
-      scaleT += (targetScale - scaleT) * 0.06;
+      scaleT += (targetScale - scaleT) * 0.04;
       const breathe = 1 + Math.sin(time * 0.001 * BREATHE_SPEED) * BREATHE_AMPLITUDE;
-      mesh.scale.setScalar(scaleT * breathe * displayVisibility);
+      const finalScale = displayVisibility > 0.001 ? scaleT * breathe * displayVisibility : 0;
+      mesh.scale.setScalar(finalScale);
 
+      // Rotation
       const rotationSpeed = isCompressing ? ACTIVE_ROTATION : IDLE_ROTATION;
       rotationY += rotationSpeed * 0.01;
-      rotationX += rotationSpeed * 0.004;
+      rotationX += rotationSpeed * 0.003;
       mesh.rotation.y = rotationY;
       mesh.rotation.x = rotationX;
 
+      // Opacity
       const targetOpacity = isCompressing ? ACTIVE_OPACITY : BASE_OPACITY;
-      opacityT += (targetOpacity - opacityT) * 0.05;
+      opacityT += (targetOpacity - opacityT) * 0.04;
       material.opacity = Math.max(0, opacityT * displayVisibility);
 
       renderer.render(scene, camera);

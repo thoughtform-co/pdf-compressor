@@ -178,7 +178,7 @@ async function compressPdfSinglePass(
     step: step.name,
   });
 
-  return doc.save({ useObjectStreams: false });
+  return doc.save({ useObjectStreams: true });
 }
 
 /**

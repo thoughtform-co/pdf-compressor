@@ -58,7 +58,7 @@ export default function HomePage() {
 
       {/* Hero */}
       <div className="relative z-10 w-full">
-        <div className="mx-auto max-w-lg px-6 pt-14 pb-6 sm:pt-20 sm:pb-8 text-center">
+        <div className="mx-auto max-w-xl px-6 pt-14 pb-6 sm:pt-20 sm:pb-8 text-center">
           <h1 className="text-4xl font-bold uppercase tracking-[0.2em] text-foreground sm:text-5xl">
             Angstrom
           </h1>
@@ -69,7 +69,7 @@ export default function HomePage() {
       </div>
 
       {/* App body */}
-      <main className="relative z-10 flex-1 mx-auto w-full max-w-lg px-6 pb-14">
+      <main className="relative z-10 flex-1 mx-auto w-full max-w-xl px-6 pb-14">
         <div className="space-y-5 border border-border rounded-sm bg-card/30 p-5">
           <FileUpload onFileSelect={onFileSelect} disabled={compressing} />
 

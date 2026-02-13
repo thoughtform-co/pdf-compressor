@@ -50,28 +50,53 @@ export function ResultsCard({
     );
   }
 
+  const noReduction =
+    result.finalSizeBytes >= result.originalSizeBytes ||
+    result.originalSizeBytes === 0;
+
   const savings =
-    result.originalSizeBytes > 0
+    result.originalSizeBytes > 0 && !noReduction
       ? (
           (1 - result.finalSizeBytes / result.originalSizeBytes) *
           100
         ).toFixed(1)
       : "0";
 
+  const borderColor = result.targetReached
+    ? "border-success/40"
+    : noReduction
+      ? "border-warning/40"
+      : "border-border";
+
   return (
-    <div className={`rounded-sm border border-border bg-card/60 p-5 ${className}`}>
+    <div className={`rounded-sm border ${borderColor} bg-card/60 p-5 ${className}`}>
       <div className="mb-4 flex items-baseline justify-between gap-2">
         <span className="section-label">Result</span>
         <span className="font-mono text-xs text-muted-foreground">
-          {result.targetReached ? "Target reached" : ""}
+          {result.targetReached
+            ? "Target reached"
+            : noReduction
+              ? "Could not reduce"
+              : "Best effort"}
         </span>
       </div>
-      <div className="mb-4">
-        <p className="font-mono text-3xl font-bold tabular-nums text-primary">
-          {savings}%
-        </p>
-        <p className="section-label mt-0.5">Smaller</p>
-      </div>
+
+      {noReduction ? (
+        <div className="mb-4">
+          <p className="text-sm text-warning">
+            This PDF could not be compressed further in the browser.
+            Try the Server mode with Ghostscript for best results on large files.
+          </p>
+        </div>
+      ) : (
+        <div className="mb-4">
+          <p className="font-mono text-3xl font-bold tabular-nums text-primary">
+            {savings}%
+          </p>
+          <p className="section-label mt-0.5">Smaller</p>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-sm border border-border bg-background/50 py-3 px-3 text-center">
           <p className="section-label">Original</p>
@@ -87,17 +112,19 @@ export function ResultsCard({
         </div>
       </div>
       <div className="mt-4 flex gap-2">
-        <button
-          type="button"
-          onClick={onDownload}
-          className="flex-1 rounded-sm border border-primary bg-primary py-3 text-xs font-bold uppercase tracking-[0.15em] text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
-        >
-          Download
-        </button>
+        {!noReduction && (
+          <button
+            type="button"
+            onClick={onDownload}
+            className="flex-1 rounded-sm border border-primary bg-primary py-3 text-xs font-bold uppercase tracking-[0.15em] text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+          >
+            Download
+          </button>
+        )}
         <button
           type="button"
           onClick={onReset}
-          className="rounded-sm border border-border bg-card/60 px-5 py-3 text-xs font-medium uppercase tracking-wider text-foreground transition-colors hover:bg-primary/5 hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+          className={`${noReduction ? "flex-1" : ""} rounded-sm border border-border bg-card/60 px-5 py-3 text-xs font-medium uppercase tracking-wider text-foreground transition-colors hover:bg-primary/5 hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background`}
         >
           Reset
         </button>

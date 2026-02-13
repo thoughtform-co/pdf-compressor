@@ -94,7 +94,7 @@ async function rasterizeSinglePass(
     await sourcePdf.destroy();
   }
 
-  return outPdf.save({ useObjectStreams: false });
+  return outPdf.save({ useObjectStreams: true });
 }
 
 export async function compressPdfRasterized(
