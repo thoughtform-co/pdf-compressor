@@ -43,9 +43,12 @@ from pdf_compressor.compress import (  # noqa: E402
 # ---------------------------------------------------------------------------
 app = FastAPI(title="PDF Compressor API")
 
+_cors_origins = os.environ.get("ALLOWED_ORIGINS", "*").strip()
+allow_origins = ["*"] if _cors_origins == "*" else [o.strip() for o in _cors_origins.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten for production
+    allow_origins=allow_origins,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=[

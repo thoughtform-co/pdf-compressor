@@ -1,0 +1,5 @@
+# Force Railway to use our Dockerfile (Ghostscript + qpdf) instead of Railpack.
+# Build context is repo root; the Dockerfile at server/Dockerfile COPYs server/ and src/.
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "server/Dockerfile"
