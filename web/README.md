@@ -1,4 +1,4 @@
-# PDF Compressor (Web)
+# Angstrom (Web)
 
 Browser-based PDF compression. No server uploads—PDFs never leave the user’s device. Optional password gate so only people with the shared password can use the app.
 

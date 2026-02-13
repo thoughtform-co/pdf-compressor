@@ -8,6 +8,28 @@ interface FileUploadProps {
   accept?: string;
 }
 
+function UploadIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" x2="12" y1="3" y2="15" />
+    </svg>
+  );
+}
+
 export function FileUpload({
   onFileSelect,
   disabled = false,
@@ -58,14 +80,15 @@ export function FileUpload({
   return (
     <label
       className={`
-        flex min-h-[220px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 transition-colors
+        group flex min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-sm border-2 border-dashed p-8 transition-all duration-300 bg-dot-grid
         ${disabled ? "cursor-not-allowed opacity-60" : ""}
         ${
           isDragging
-            ? "border-[var(--color-primary)] bg-[var(--color-primary)]/5"
-            : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-primary)]/50 hover:bg-[var(--color-bg)]"
+            ? "border-primary drop-zone-glow-active bg-primary/5"
+            : "border-border drop-zone-glow hover:border-primary/40"
         }
       `}
+      style={{ backgroundColor: `hsl(var(--dropzone))` }}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -78,16 +101,17 @@ export function FileUpload({
         className="sr-only"
         aria-label="Choose PDF file"
       />
-      <span
-        className="mb-2 text-4xl"
-        aria-hidden
-      >
-        📄
+      <UploadIcon
+        className={`mb-3 transition-transform duration-300 ${
+          isDragging
+            ? "text-primary -translate-y-1"
+            : "text-muted-foreground group-hover:text-primary group-hover:-translate-y-0.5"
+        }`}
+      />
+      <span className="text-center text-xs font-medium uppercase tracking-wider text-foreground/90">
+        Drop PDF here or click to browse
       </span>
-      <span className="text-center font-medium text-[var(--color-text)]">
-        Drop a PDF here or click to browse
-      </span>
-      <span className="mt-1 text-sm text-[var(--color-muted)]">
+      <span className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground">
         PDF only, any size
       </span>
     </label>

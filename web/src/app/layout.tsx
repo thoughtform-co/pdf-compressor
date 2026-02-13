@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
+import { Chakra_Petch, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-display",
+const chakraPetch = Chakra_Petch({
+  variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
-const dmSans = DM_Sans({
-  variable: "--font-sans",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "PDF Compressor",
-  description: "Compress PDFs in your browser. No uploads, no installs.",
+  title: "Angstrom",
+  description: "Compress PDFs to the atomic level.",
 };
 
 export default function RootLayout({
@@ -25,8 +26,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${bricolage.variable} ${dmSans.variable}`}>
-      <body className="font-sans antialiased">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body
+        className={`font-sans antialiased ${chakraPetch.variable} ${jetbrainsMono.variable}`}
+      >
         {children}
       </body>
     </html>

@@ -30,17 +30,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[var(--color-bg)]">
-      <div className="w-full max-w-sm rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 shadow-lg">
-        <h1 className="text-2xl font-display font-semibold text-[var(--color-text)] mb-1">
-          PDF Compressor
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background bg-dot-grid">
+      <div className="w-full max-w-sm rounded-sm border border-border bg-card/90 p-8 backdrop-blur-xl">
+        <h1 className="mb-1 text-2xl font-bold uppercase tracking-[0.15em] text-foreground">
+          Angstrom
         </h1>
-        <p className="text-sm text-[var(--color-muted)] mb-6">
-          Enter the password to continue
+        <p className="mb-6 text-[10px] uppercase tracking-wider text-muted-foreground">
+          Enter password to continue
         </p>
 
         {error && (
-          <p className="text-sm text-[var(--color-error)] mb-4" role="alert">
+          <p className="mb-4 text-sm text-destructive" role="alert">
             {error}
           </p>
         )}
@@ -49,7 +49,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-[var(--color-text)] mb-1"
+              className="section-label mb-1 block"
             >
               Password
             </label>
@@ -61,21 +61,24 @@ export default function LoginPage() {
               required
               autoComplete="current-password"
               autoFocus
-              className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-2 text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+              className="w-full rounded-sm border border-input bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               placeholder="••••••••"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-[var(--color-primary)] px-4 py-2.5 font-medium text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 disabled:opacity-50"
+            className="w-full rounded-sm border border-primary bg-primary px-4 py-2.5 text-xs font-bold uppercase tracking-[0.15em] text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50"
           >
             {loading ? "Checking…" : "Continue"}
           </button>
         </form>
       </div>
-      <p className="mt-6 text-sm text-[var(--color-muted)]">
-        <Link href="/" className="underline hover:text-[var(--color-text)]">
+      <p className="mt-6 text-[10px] uppercase tracking-wider text-muted-foreground">
+        <Link
+          href="/"
+          className="underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background rounded-sm"
+        >
           Back to home
         </Link>
       </p>

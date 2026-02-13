@@ -1,23 +1,48 @@
 @import "tailwindcss";
 
 :root {
-  /* Friendly / modern palette */
-  --color-primary: #e07c5a;
-  --color-bg: #faf9f7;
-  --color-surface: #ffffff;
-  --color-text: #1c1917;
-  --color-muted: #78716c;
-  --color-border: #e7e5e4;
-  --color-success: #2d6e4f;
-  --color-error: #b91c1c;
-  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  /* Angstrom – deep space navy, cyan accent (Starfield-inspired) */
+  --background: 220 55% 4%;
+  --foreground: 210 30% 93%;
+  --card: 220 45% 7%;
+  --primary: 190 95% 50%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 45% 12%;
+  --muted: 220 45% 12%;
+  --muted-foreground: 215 20% 50%;
+  --accent: 190 95% 50%;
+  --destructive: 0 70% 55%;
+  --border: 220 35% 16%;
+  --input: 220 35% 16%;
+  --ring: 190 95% 50%;
+  --success: 170 80% 45%;
+  --warning: 38 92% 50%;
+  --radius: 0.125rem;
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
+  --dropzone: 220 50% 6%;
+  --dropzone-border: 220 35% 18%;
 }
 
 @theme inline {
-  --color-background: var(--color-bg);
-  --color-foreground: var(--color-text);
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-destructive: hsl(var(--destructive));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-success: hsl(var(--success));
+  --color-warning: hsl(var(--warning));
+  --radius: var(--radius);
   --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -30,24 +55,135 @@
 }
 
 body {
-  background: var(--color-bg);
-  color: var(--color-text);
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
   font-family: var(--font-sans);
+  font-feature-settings: "rlig" 1, "calt" 1;
 }
 
 .font-display {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
 }
 
-/* Slider thumb for Firefox */
+/* Brutalist section label (Starfield-style) */
+.section-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Dot-grid background pattern */
+.bg-dot-grid {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    hsl(var(--muted-foreground) / 0.15) 1px,
+    transparent 0
+  );
+  background-size: 24px 24px;
+  background-position: 0 0;
+}
+
+/* Subtle scan-line overlay */
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    hsl(var(--background) / 0.03) 2px,
+    hsl(var(--background) / 0.03) 4px
+  );
+  pointer-events: none;
+}
+
+/* Angstrom-style scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) hsl(var(--muted));
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 0;
+}
+*::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 0;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Slider – thin track, square thumb (brutalist) */
 input[type="range"] {
   background: transparent;
 }
+input[type="range"]::-webkit-slider-thumb {
+  background: hsl(var(--primary));
+  border-radius: 0;
+}
 input[type="range"]::-moz-range-thumb {
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 9999px;
-  background: var(--color-primary);
+  border-radius: 0;
+  background: hsl(var(--primary));
   cursor: pointer;
   border: 0;
+}
+
+/* Target size slider: thin track, square thumb, cyan fill */
+.target-size-slider {
+  --value-percent: 0%;
+}
+.target-size-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 0;
+  background: linear-gradient(
+    to right,
+    hsl(var(--primary)) 0%,
+    hsl(var(--primary)) var(--value-percent, 0%),
+    hsl(var(--muted)) var(--value-percent, 0%),
+    hsl(var(--muted)) 100%
+  );
+}
+.target-size-slider::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 0;
+  border: 1px solid hsl(var(--background));
+  box-shadow: 0 0 0 1px hsl(var(--border));
+}
+.target-size-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 0;
+  background: hsl(var(--muted));
+}
+.target-size-slider::-moz-range-progress {
+  height: 4px;
+  border-radius: 0;
+  background: hsl(var(--primary));
+}
+.target-size-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 0;
+  border: 1px solid hsl(var(--background));
+  box-shadow: 0 0 0 1px hsl(var(--border));
+}
+
+/* Cyan glow for drop zone */
+.drop-zone-glow {
+  box-shadow: 0 0 30px hsl(var(--primary) / 0.08);
+}
+.drop-zone-glow:hover {
+  box-shadow: 0 0 40px hsl(var(--primary) / 0.12);
+}
+.drop-zone-glow-active {
+  box-shadow: 0 0 40px hsl(var(--primary) / 0.25);
 }

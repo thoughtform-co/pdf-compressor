@@ -62,94 +62,95 @@ export function CompressionControls({
     },
   ];
 
+  const valuePercent = ((targetMb - MIN_MB) / (MAX_MB - MIN_MB)) * 100;
+
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
-      <div className="flex flex-col gap-6">
-        {/* Engine indicator */}
-        {serverChecked && (
-          <div
-            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium ${
-              serverStatus.available
-                ? "bg-[var(--color-success)]/10 text-[var(--color-success)]"
-                : "bg-[var(--color-border)]/50 text-[var(--color-muted)]"
+    <div className="flex flex-col gap-5">
+      {serverChecked && (
+        <div
+          className={`flex items-center gap-2 rounded-sm border border-border px-3 py-2 text-[10px] font-medium uppercase tracking-wider ${
+            serverStatus.available
+              ? "border-primary/30 bg-primary/5 text-primary"
+              : "bg-muted/50 text-muted-foreground"
+          }`}
+        >
+          <span
+            className={`inline-block h-1.5 w-1.5 shrink-0 ${
+              serverStatus.available ? "bg-primary" : "bg-muted-foreground"
             }`}
-          >
-            <span
-              className={`inline-block h-2 w-2 rounded-full ${
-                serverStatus.available
-                  ? "bg-[var(--color-success)]"
-                  : "bg-[var(--color-muted)]"
+          />
+          {serverStatus.available
+            ? "Server connected"
+            : "Server offline — browser modes available"}
+        </div>
+      )}
+
+      {/* Mode selector */}
+      <div>
+        <p className="section-label mb-2">Mode</p>
+        <div className="grid grid-cols-3 gap-1.5">
+          {modes.map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => m.available && onModeChange(m.id)}
+              disabled={disabled || compressing || !m.available}
+              className={`rounded-sm border px-2.5 py-2 text-left text-[10px] font-medium uppercase tracking-wider transition-all duration-200 ${
+                mode === m.id
+                  ? "border-primary bg-primary/10 text-foreground"
+                  : m.available
+                    ? "border-border bg-card/60 text-muted-foreground hover:border-primary/40 hover:bg-primary/5 hover:text-foreground"
+                    : "cursor-not-allowed border-border bg-card/30 text-muted-foreground opacity-50"
               }`}
-            />
-            {serverStatus.available
-              ? "Compression server connected"
-              : "Compression server offline — browser modes available"}
-          </div>
-        )}
-
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex-1">
-            <p className="block text-sm font-medium text-[var(--color-text)] mb-2">
-              Compression mode
-            </p>
-            <div className="mb-4 grid gap-2 sm:grid-cols-3">
-              {modes.map((m) => (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => m.available && onModeChange(m.id)}
-                  disabled={disabled || compressing || !m.available}
-                  className={`rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
-                    mode === m.id
-                      ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-text)]"
-                      : m.available
-                        ? "border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-muted)] hover:border-[var(--color-primary)]/30"
-                        : "border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-muted)] opacity-50 cursor-not-allowed"
-                  }`}
-                >
-                  <span className="block font-medium">{m.label}</span>
-                  <span className="block text-xs leading-snug">
-                    {m.description}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            <label
-              htmlFor="target-mb"
-              className="block text-sm font-medium text-[var(--color-text)] mb-2"
             >
-              Target size: {targetMb} MB
-            </label>
-            <input
-              id="target-mb"
-              type="range"
-              min={MIN_MB}
-              max={MAX_MB}
-              step={STEP_MB}
-              value={targetMb}
-              onChange={(e) => onTargetMbChange(Number(e.target.value))}
-              disabled={disabled}
-              className="w-full h-2 rounded-full appearance-none bg-[var(--color-border)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-primary)] [&::-webkit-slider-thumb]:cursor-pointer"
-              aria-valuemin={MIN_MB}
-              aria-valuemax={MAX_MB}
-              aria-valuenow={targetMb}
-            />
-            <div className="mt-1 flex justify-between text-xs text-[var(--color-muted)]">
-              <span>{MIN_MB} MB</span>
-              <span>{MAX_MB} MB</span>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onCompress}
-            disabled={disabled || compressing || !hasFile}
-            className="rounded-xl bg-[var(--color-primary)] px-6 py-3 font-medium text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-          >
-            {compressing ? "Compressing…" : "Compress PDF"}
-          </button>
+              <span className="block leading-tight">{m.label}</span>
+            </button>
+          ))}
         </div>
       </div>
+
+      {/* Target size slider – stat readout style */}
+      <div>
+        <div className="mb-2 flex items-baseline justify-between gap-2">
+          <span className="section-label">Target size</span>
+          <span className="font-mono text-sm font-medium tabular-nums text-primary">
+            {targetMb} MB
+          </span>
+        </div>
+        <input
+          id="target-mb"
+          type="range"
+          min={MIN_MB}
+          max={MAX_MB}
+          step={STEP_MB}
+          value={targetMb}
+          onChange={(e) => onTargetMbChange(Number(e.target.value))}
+          disabled={disabled}
+          style={
+            { "--value-percent": `${valuePercent}%` } as React.CSSProperties
+          }
+          className="target-size-slider mt-1 block w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer"
+          aria-valuemin={MIN_MB}
+          aria-valuemax={MAX_MB}
+          aria-valuenow={targetMb}
+          aria-valuetext={`${targetMb} megabytes`}
+          aria-label="Target file size"
+        />
+        <div className="mt-1 flex justify-between font-mono text-[10px] text-muted-foreground/70">
+          <span>{MIN_MB} MB</span>
+          <span>{MAX_MB} MB</span>
+        </div>
+      </div>
+
+      {/* Compress button */}
+      <button
+        type="button"
+        onClick={onCompress}
+        disabled={disabled || compressing || !hasFile}
+        className="w-full rounded-sm border border-primary bg-primary py-3.5 text-xs font-bold uppercase tracking-[0.15em] text-primary-foreground transition-all duration-200 hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground"
+      >
+        {compressing ? "Compressing…" : "Compress"}
+      </button>
     </div>
   );
 }

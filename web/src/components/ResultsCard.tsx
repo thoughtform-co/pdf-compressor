@@ -33,16 +33,16 @@ export function ResultsCard({
   if (!result.success || !result.outputBytes) {
     return (
       <div
-        className={`rounded-2xl border border-[var(--color-error)]/30 bg-[var(--color-surface)] p-6 ${className}`}
+        className={`rounded-sm border border-destructive/30 bg-card/60 p-5 ${className}`}
         role="alert"
       >
-        <p className="text-[var(--color-error)]">
+        <p className="text-sm text-destructive">
           {result.errorMessage ?? "Compression failed."}
         </p>
         <button
           type="button"
           onClick={onReset}
-          className="mt-4 text-sm font-medium text-[var(--color-primary)] hover:underline"
+          className="mt-3 text-xs font-medium uppercase tracking-wider text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background rounded-sm"
         >
           Try again
         </button>
@@ -57,48 +57,49 @@ export function ResultsCard({
           100
         ).toFixed(1)
       : "0";
-  const baseName = fileName.replace(/\.pdf$/i, "");
-  const downloadFileName = `${baseName}.compressed.pdf`;
 
   return (
-    <div
-      className={`rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 ${className}`}
-    >
-      <h2 className="font-display text-lg font-semibold text-[var(--color-text)] mb-4">
-        Done
-      </h2>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <p className="text-sm text-[var(--color-muted)]">Original</p>
-          <p className="font-medium text-[var(--color-text)]">
+    <div className={`rounded-sm border border-border bg-card/60 p-5 ${className}`}>
+      <div className="mb-4 flex items-baseline justify-between gap-2">
+        <span className="section-label">Result</span>
+        <span className="font-mono text-xs text-muted-foreground">
+          {result.targetReached ? "Target reached" : ""}
+        </span>
+      </div>
+      <div className="mb-4">
+        <p className="font-mono text-3xl font-bold tabular-nums text-primary">
+          {savings}%
+        </p>
+        <p className="section-label mt-0.5">Smaller</p>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-sm border border-border bg-background/50 py-3 px-3 text-center">
+          <p className="section-label">Original</p>
+          <p className="mt-0.5 font-mono text-sm font-medium tabular-nums text-foreground">
             {formatBytes(result.originalSizeBytes)}
           </p>
         </div>
-        <div>
-          <p className="text-sm text-[var(--color-muted)]">Compressed</p>
-          <p className="font-medium text-[var(--color-success)]">
+        <div className="rounded-sm border border-border bg-background/50 py-3 px-3 text-center">
+          <p className="section-label">Compressed</p>
+          <p className="mt-0.5 font-mono text-sm font-medium tabular-nums text-primary">
             {formatBytes(result.finalSizeBytes)}
           </p>
         </div>
       </div>
-      <p className="mt-2 text-sm text-[var(--color-muted)]">
-        {savings}% smaller · step: {result.stepUsed}
-        {result.targetReached ? " · Target reached" : ""}
-      </p>
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="mt-4 flex gap-2">
         <button
           type="button"
           onClick={onDownload}
-          className="rounded-xl bg-[var(--color-primary)] px-5 py-2.5 font-medium text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+          className="flex-1 rounded-sm border border-primary bg-primary py-3 text-xs font-bold uppercase tracking-[0.15em] text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
         >
-          Download {downloadFileName}
+          Download
         </button>
         <button
           type="button"
           onClick={onReset}
-          className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] px-5 py-2.5 font-medium text-[var(--color-text)] hover:bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+          className="rounded-sm border border-border bg-card/60 px-5 py-3 text-xs font-medium uppercase tracking-wider text-foreground transition-colors hover:bg-primary/5 hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
         >
-          Compress another
+          Reset
         </button>
       </div>
     </div>

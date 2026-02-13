@@ -12,17 +12,18 @@ export function ProgressLog({ entries, className = "" }: ProgressLogProps) {
 
   return (
     <div
-      className={`rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 ${className}`}
+      className={`relative rounded-sm border border-border bg-card/60 p-4 scanlines ${className}`}
       role="log"
       aria-live="polite"
       aria-label="Compression progress"
     >
-      <p className="mb-2 text-sm font-medium text-[var(--color-text)]">
-        Progress
-      </p>
-      <ul className="max-h-48 space-y-1 overflow-y-auto font-mono text-xs text-[var(--color-muted)]">
+      <p className="section-label mb-2">Progress</p>
+      <ul className="max-h-40 space-y-0.5 overflow-y-auto font-mono text-xs text-muted-foreground">
         {entries.map((entry, i) => (
-          <li key={i}>{entry.message}</li>
+          <li key={i} className="text-foreground/80">
+            <span className="text-primary/80 select-none">&gt; </span>
+            {entry.message}
+          </li>
         ))}
       </ul>
     </div>

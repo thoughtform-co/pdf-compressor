@@ -23,24 +23,24 @@ export function Header() {
   }
 
   return (
-    <header className="border-b border-[var(--color-border)] bg-[var(--color-surface)]">
+    <header className="border-b border-border bg-card">
       <div className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4">
         <Link
           href="/"
-          className="font-display text-lg font-semibold text-[var(--color-text)]"
+          className="text-lg font-bold uppercase tracking-[0.2em] text-foreground"
         >
-          PDF Compressor
+          Angstrom
         </Link>
         {authEnabled === true ? (
           <button
             type="button"
             onClick={handleSignOut}
-            className="text-sm font-medium text-[var(--color-muted)] hover:text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 rounded px-2 py-1"
+            className="rounded-sm px-2 py-1 text-xs font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
           >
             Sign out
           </button>
         ) : authEnabled === false ? (
-          <span className="text-xs text-[var(--color-muted)]">
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
             No password set (local preview)
           </span>
         ) : null}
