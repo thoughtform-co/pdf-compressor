@@ -1,5 +1,20 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { AUTH_COOKIE_NAME, isPasswordAuthConfigured, isAuthenticated } from "./src/lib/auth";
+
+const AUTH_COOKIE_NAME = "pdf_compressor_auth";
+
+function isPasswordAuthConfigured(): boolean {
+  return (
+    typeof process.env.APP_PASSWORD === "string" &&
+    process.env.APP_PASSWORD.length > 0 &&
+    typeof process.env.AUTH_COOKIE_VALUE === "string" &&
+    process.env.AUTH_COOKIE_VALUE.length > 0
+  );
+}
+
+function isAuthenticated(cookieValue: string | undefined): boolean {
+  if (!cookieValue) return false;
+  return process.env.AUTH_COOKIE_VALUE === cookieValue;
+}
 
 export async function middleware(request: NextRequest) {
   if (!isPasswordAuthConfigured()) {
