@@ -30,8 +30,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background bg-dot-grid">
-      <div className="w-full max-w-sm rounded-sm border border-border bg-card/90 p-8 backdrop-blur-xl">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-background bg-dot-grid">
+      <div className="w-full max-w-md rounded-sm border border-border bg-card/90 p-8 backdrop-blur-xl">
         <h1 className="mb-1 text-2xl font-bold uppercase tracking-[0.15em] text-foreground">
           Angstrom
         </h1>

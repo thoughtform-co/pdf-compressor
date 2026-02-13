@@ -10,9 +10,9 @@ import { ProgressLog } from "@/components/ProgressLog";
 import { ResultsCard } from "@/components/ResultsCard";
 import { useCompression } from "@/hooks/useCompression";
 
-const CompressionVisualizer = dynamic(
+const CompressionParticleField = dynamic(
   () =>
-    import("@/components/CompressionVisualizer").then((m) => m.CompressionVisualizer),
+    import("@/components/CompressionParticleField").then((m) => m.CompressionParticleField),
   { ssr: false }
 );
 
@@ -54,13 +54,11 @@ export default function HomePage() {
   return (
     <div className="relative min-h-screen flex flex-col bg-background overflow-hidden">
       <ParticleBackground compressing={compressing} />
-      {compressing && (
-        <CompressionVisualizer compressing={compressing} progress={progress.length} />
-      )}
+      <CompressionParticleField compressing={compressing} />
 
       {/* Hero */}
       <div className="relative z-10 w-full">
-        <div className="mx-auto max-w-md px-5 pt-14 pb-6 sm:pt-20 sm:pb-8 text-center">
+        <div className="mx-auto max-w-lg px-6 pt-14 pb-6 sm:pt-20 sm:pb-8 text-center">
           <h1 className="text-4xl font-bold uppercase tracking-[0.2em] text-foreground sm:text-5xl">
             Angstrom
           </h1>
@@ -71,8 +69,8 @@ export default function HomePage() {
       </div>
 
       {/* App body */}
-      <main className="relative z-10 flex-1 mx-auto w-full max-w-md px-5 pb-14">
-        <div className="space-y-5 border border-border rounded-sm bg-card/30 p-4">
+      <main className="relative z-10 flex-1 mx-auto w-full max-w-lg px-6 pb-14">
+        <div className="space-y-5 border border-border rounded-sm bg-card/30 p-5">
           <FileUpload onFileSelect={onFileSelect} disabled={compressing} />
 
           {file && (

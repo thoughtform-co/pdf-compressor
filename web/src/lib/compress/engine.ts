@@ -100,6 +100,9 @@ async function compressPdfSinglePass(
 ): Promise<Uint8Array> {
   const pages = doc.getPages();
   let processed = 0;
+  let replaced = 0;
+  let skippedLarger = 0;
+  const replacementCache = new Map<string, PDFRef | null>();
 
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
@@ -116,6 +119,16 @@ async function compressPdfSinglePass(
     const entries = xoDict.entries();
     for (const [name, refObj] of entries) {
       if (!(refObj instanceof PDFRef)) continue;
+
+      const cacheKey = refObj.toString();
+      if (replacementCache.has(cacheKey)) {
+        const cachedRef = replacementCache.get(cacheKey);
+        if (cachedRef) {
+          leaf.setXObject(name, cachedRef);
+        }
+        continue;
+      }
+
       const obj = doc.context.lookup(refObj);
       if (!obj || !(obj instanceof PDFRawStream)) continue;
 
@@ -142,9 +155,18 @@ async function compressPdfSinglePass(
         );
         bitmap.close();
 
+        // Keep original image when recompression is not actually smaller.
+        if (jpegBytes.length >= contents.length) {
+          skippedLarger++;
+          replacementCache.set(cacheKey, null);
+          continue;
+        }
+
         const newImage = await doc.embedJpg(jpegBytes);
         leaf.setXObject(name, newImage.ref);
+        replacementCache.set(cacheKey, newImage.ref);
         processed++;
+        replaced++;
       } catch {
         // Skip images that can't be processed
       }
@@ -152,7 +174,7 @@ async function compressPdfSinglePass(
   }
 
   onProgress({
-    message: `Processed ${processed} images at step "${step.name}"`,
+    message: `Processed ${processed} images at step "${step.name}" (replaced: ${replaced}, skipped larger: ${skippedLarger})`,
     step: step.name,
   });
 

@@ -83,6 +83,19 @@ export function useCompression() {
         // preserveText
         const bytes = new Uint8Array(await file.arrayBuffer());
         res = await runCompressionInWorker(bytes, targetMb, onProgress);
+
+        // If preserve-text path cannot reduce size, fall back to raster mode.
+        // This sacrifices text selection but avoids a "no-op" compression result.
+        if (res.finalSizeBytes >= res.originalSizeBytes) {
+          onProgress({
+            message:
+              "Preserve-text mode could not reduce file size. Trying high-compression raster fallback (text may not remain selectable)...",
+          });
+          const rasterRes = await compressPdfRasterized(bytes, targetMb, onProgress);
+          if (rasterRes.finalSizeBytes < res.finalSizeBytes) {
+            res = rasterRes;
+          }
+        }
       }
 
       setResult(res);
