@@ -46,7 +46,12 @@ async function rasterizeSinglePass(
 ): Promise<Uint8Array> {
   // Use main-thread parsing/rendering to avoid runtime failures when the CDN worker
   // cannot be fetched (offline/corporate network/CSP environments).
-  const loadingTask = pdfjs.getDocument({ data: inputBytes, disableWorker: true });
+  const loadingTask = pdfjs.getDocument({
+    data: inputBytes,
+    // pdfjs-dist runtime supports this flag, but the bundled type definition
+    // for this import path does not expose it.
+    disableWorker: true,
+  } as unknown as Parameters<typeof pdfjs.getDocument>[0]);
   const sourcePdf = await loadingTask.promise;
   const outPdf = await PDFDocument.create();
 
