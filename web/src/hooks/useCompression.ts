@@ -71,6 +71,24 @@ export function useCompression() {
           });
           const bytes = new Uint8Array(await file.arrayBuffer());
           res = await runCompressionInWorker(bytes, targetMb, onProgress);
+
+          // Same safeguard as preserve-text mode:
+          // if browser preserve-text path cannot reduce size, try raster fallback.
+          if (res.finalSizeBytes >= res.originalSizeBytes) {
+            onProgress({
+              message:
+                "Browser preserve-text path could not reduce file size. Trying high-compression raster fallback (text may not remain selectable)...",
+            });
+            const freshBytes = new Uint8Array(await file.arrayBuffer());
+            const rasterRes = await compressPdfRasterized(
+              freshBytes,
+              targetMb,
+              onProgress
+            );
+            if (rasterRes.finalSizeBytes < res.finalSizeBytes) {
+              res = rasterRes;
+            }
+          }
         }
       } else if (mode === "highCompression") {
         const bytes = new Uint8Array(await file.arrayBuffer());

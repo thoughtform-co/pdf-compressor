@@ -44,10 +44,9 @@ async function rasterizeSinglePass(
   step: RasterStep,
   onProgress: ProgressCallback
 ): Promise<Uint8Array> {
-  const workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
-  pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
-
-  const loadingTask = pdfjs.getDocument({ data: inputBytes });
+  // Use main-thread parsing/rendering to avoid runtime failures when the CDN worker
+  // cannot be fetched (offline/corporate network/CSP environments).
+  const loadingTask = pdfjs.getDocument({ data: inputBytes, disableWorker: true });
   const sourcePdf = await loadingTask.promise;
   const outPdf = await PDFDocument.create();
 
