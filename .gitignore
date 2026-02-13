@@ -19,6 +19,11 @@ Thumbs.db
 # Test PDFs (large files)
 pdfs/*.pdf
 
+# Node / Next.js
+node_modules/
+.next/
+.env.local
+
 # Local plans
 .cursor/plans/
 .claude/
