@@ -5,7 +5,9 @@
 
 import { PDFDocument } from "pdf-lib";
 import type { CompressionProgress, CompressionResult, ProgressCallback } from "./types";
-import * as pdfjs from "pdfjs-dist/legacy/build/pdf";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore pdfjs-dist v5 ships .mjs only; bare path may fail on some resolvers
+import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 
 interface RasterStep {
   name: string;
@@ -63,6 +65,7 @@ async function rasterizeSinglePass(
       await page.render({
         canvasContext: ctx,
         viewport,
+        canvas,
       }).promise;
 
       const blob = await new Promise<Blob>((resolve, reject) => {
