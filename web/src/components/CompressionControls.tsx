@@ -45,8 +45,8 @@ export function CompressionControls({
       label: "Server (best)",
       description: serverStatus.available
         ? `Ghostscript${serverStatus.qpdf ? " + qpdf" : ""}. Same quality as the desktop tool.`
-        : "Compression server not available.",
-      available: serverStatus.available,
+        : "Server offline — will fall back to browser compression.",
+      available: true,
     },
     {
       id: "preserveText",
@@ -103,7 +103,12 @@ export function CompressionControls({
                     : "cursor-not-allowed border-border bg-card/30 text-muted-foreground opacity-50"
               }`}
             >
-              <span className="block leading-tight">{m.label}</span>
+              <span className="block leading-tight">
+                {m.label}
+                {m.id === "server" && !serverStatus.available && (
+                  <span className="ml-1 opacity-50" title="Server offline — will fall back to browser">*</span>
+                )}
+              </span>
             </button>
           ))}
         </div>

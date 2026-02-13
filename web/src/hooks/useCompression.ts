@@ -37,10 +37,6 @@ export function useCompression() {
       if (cancelled) return;
       setServerStatus(status);
       setServerChecked(true);
-      // Default to server mode if available, otherwise preserve text
-      if (!status.available) {
-        setMode("preserveText");
-      }
     });
     return () => {
       cancelled = true;
