@@ -3,8 +3,8 @@
 import { useEffect, useRef } from "react";
 
 const DOT_SPACING = 28;
-const DOT_COLOR = { r: 0, g: 220, b: 255 }; // dim cyan (Starfield blue)
-const BASE_OPACITY = 0.12;
+const DOT_COLOR = { r: 202, g: 165, b: 84 }; // Thoughtform Gold
+const BASE_OPACITY = 0.08;
 const WAVE_AMPLITUDE = 3;
 const WAVE_SPEED = 0.0008;
 

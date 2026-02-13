@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-const CYAN = 0x00d4ff;
+const GOLD = 0xCAA554;
 const PARTICLE_COUNT = 4500;
 const BASE_OPACITY = 0.04;
 const ACTIVE_OPACITY = 0.10;
@@ -150,7 +150,7 @@ export function CompressionParticleField({ compressing }: { compressing: boolean
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
     const material = new THREE.PointsMaterial({
-      color: CYAN,
+      color: GOLD,
       size: 0.035,
       transparent: true,
       opacity: BASE_OPACITY,

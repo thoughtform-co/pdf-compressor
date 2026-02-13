@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
-import { Chakra_Petch, JetBrains_Mono } from "next/font/google";
+import { PT_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
-const chakraPetch = Chakra_Petch({
-  variable: "--font-sans",
+const ptMono = PT_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400"],
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
+const ibmPlexSans = IBM_Plex_Sans({
+  variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500"],
   display: "swap",
 });
 
@@ -28,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`font-sans antialiased ${chakraPetch.variable} ${jetbrainsMono.variable}`}
+        className={`font-sans antialiased ${ptMono.variable} ${ibmPlexSans.variable}`}
       >
         {children}
       </body>

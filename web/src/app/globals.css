@@ -1,48 +1,59 @@
 @import "tailwindcss";
 
 :root {
-  /* Angstrom – deep space navy, cyan accent (Starfield-inspired) */
-  --background: 220 55% 4%;
-  --foreground: 210 30% 93%;
-  --card: 220 45% 7%;
-  --primary: 190 95% 50%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 220 45% 12%;
-  --muted: 220 45% 12%;
-  --muted-foreground: 215 20% 50%;
-  --accent: 190 95% 50%;
-  --destructive: 0 70% 55%;
-  --border: 220 35% 16%;
-  --input: 220 35% 16%;
-  --ring: 190 95% 50%;
-  --success: 170 80% 45%;
-  --warning: 38 92% 50%;
-  --radius: 0.125rem;
+  /* Thoughtform – Void/Dawn/Gold (retro-futuristic research station) */
+  --background: #050403;
+  --foreground: #ECE3D6;
+  --card: #0A0908;
+  --primary: #CAA554;
+  --primary-foreground: #050403;
+  --secondary: #141311;
+  --muted: #141311;
+  --muted-foreground: rgba(236, 227, 214, 0.5);
+  --accent: #CAA554;
+  --destructive: #8B5A5A;
+  --border: rgba(236, 227, 214, 0.08);
+  --input: rgba(236, 227, 214, 0.15);
+  --ring: #CAA554;
+  --success: #5B8A7A;
+  --warning: #C17F59;
+  --radius: 0;
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, monospace;
-  --dropzone: 220 50% 6%;
-  --dropzone-border: 220 35% 18%;
+  --dropzone: #0A0908;
+  --dropzone-border: rgba(236, 227, 214, 0.15);
+
+  /* Thoughtform motion */
+  --ease-instrument: cubic-bezier(0.19, 1, 0.22, 1);
+  --motion-deliberate: 400ms;
 }
 
 @theme inline {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-destructive: hsl(var(--destructive));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-success: hsl(var(--success));
-  --color-warning: hsl(var(--warning));
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
   --radius: var(--radius);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+}
+
+/* Thoughtform: zero border-radius everywhere */
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -55,8 +66,8 @@
 }
 
 body {
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background: var(--background);
+  color: var(--foreground);
   font-family: var(--font-sans);
   font-feature-settings: "rlig" 1, "calt" 1;
 }
@@ -65,20 +76,20 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Brutalist section label (Starfield-style) */
+/* Section label (Thoughtform HUD-style) */
 .section-label {
   font-size: 10px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: hsl(var(--muted-foreground));
+  color: var(--muted-foreground);
 }
 
-/* Dot-grid background pattern */
+/* Dot-grid background pattern – Dawn-15 */
 .bg-dot-grid {
   background-image: radial-gradient(
     circle at 1px 1px,
-    hsl(var(--muted-foreground) / 0.15) 1px,
+    rgba(236, 227, 214, 0.15) 1px,
     transparent 0
   );
   background-size: 24px 24px;
@@ -94,49 +105,49 @@ body {
     0deg,
     transparent,
     transparent 2px,
-    hsl(var(--background) / 0.03) 2px,
-    hsl(var(--background) / 0.03) 4px
+    rgba(5, 4, 3, 0.03) 2px,
+    rgba(5, 4, 3, 0.03) 4px
   );
   pointer-events: none;
 }
 
-/* Angstrom-style scrollbar */
+/* Thoughtform-style scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: hsl(var(--border)) hsl(var(--muted));
+  scrollbar-color: var(--border) var(--muted);
 }
 *::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 *::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
+  background: var(--muted);
   border-radius: 0;
 }
 *::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
+  background: var(--border);
   border-radius: 0;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
+  background: var(--muted-foreground);
 }
 
-/* Slider – thin track, square thumb (brutalist) */
+/* Slider – thin track, square thumb (gold) */
 input[type="range"] {
   background: transparent;
 }
 input[type="range"]::-webkit-slider-thumb {
-  background: hsl(var(--primary));
+  background: var(--primary);
   border-radius: 0;
 }
 input[type="range"]::-moz-range-thumb {
   border-radius: 0;
-  background: hsl(var(--primary));
+  background: var(--primary);
   cursor: pointer;
   border: 0;
 }
 
-/* Target size slider: thin track, square thumb, cyan fill */
+/* Target size slider: thin track, square thumb, gold fill */
 .target-size-slider {
   --value-percent: 0%;
 }
@@ -145,10 +156,10 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 0;
   background: linear-gradient(
     to right,
-    hsl(var(--primary)) 0%,
-    hsl(var(--primary)) var(--value-percent, 0%),
-    hsl(var(--muted)) var(--value-percent, 0%),
-    hsl(var(--muted)) 100%
+    var(--primary) 0%,
+    var(--primary) var(--value-percent, 0%),
+    var(--muted) var(--value-percent, 0%),
+    var(--muted) 100%
   );
 }
 .target-size-slider::-webkit-slider-thumb {
@@ -156,34 +167,34 @@ input[type="range"]::-moz-range-thumb {
   height: 14px;
   margin-top: -5px;
   border-radius: 0;
-  border: 1px solid hsl(var(--background));
-  box-shadow: 0 0 0 1px hsl(var(--border));
+  border: 1px solid var(--background);
+  box-shadow: 0 0 0 1px var(--border);
 }
 .target-size-slider::-moz-range-track {
   height: 4px;
   border-radius: 0;
-  background: hsl(var(--muted));
+  background: var(--muted);
 }
 .target-size-slider::-moz-range-progress {
   height: 4px;
   border-radius: 0;
-  background: hsl(var(--primary));
+  background: var(--primary);
 }
 .target-size-slider::-moz-range-thumb {
   width: 14px;
   height: 14px;
   border-radius: 0;
-  border: 1px solid hsl(var(--background));
-  box-shadow: 0 0 0 1px hsl(var(--border));
+  border: 1px solid var(--background);
+  box-shadow: 0 0 0 1px var(--border);
 }
 
-/* Cyan glow for drop zone */
+/* Gold glow for drop zone */
 .drop-zone-glow {
-  box-shadow: 0 0 30px hsl(var(--primary) / 0.08);
+  box-shadow: 0 0 30px rgba(202, 165, 84, 0.08);
 }
 .drop-zone-glow:hover {
-  box-shadow: 0 0 40px hsl(var(--primary) / 0.12);
+  box-shadow: 0 0 40px rgba(202, 165, 84, 0.12);
 }
 .drop-zone-glow-active {
-  box-shadow: 0 0 40px hsl(var(--primary) / 0.25);
+  box-shadow: 0 0 40px rgba(202, 165, 84, 0.25);
 }

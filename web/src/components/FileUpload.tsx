@@ -88,7 +88,7 @@ export function FileUpload({
             : "border-border drop-zone-glow hover:border-primary/40"
         }
       `}
-      style={{ backgroundColor: `hsl(var(--dropzone))` }}
+      style={{ backgroundColor: "var(--dropzone)" }}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
