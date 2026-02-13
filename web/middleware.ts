@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { AUTH_COOKIE_NAME, isPasswordAuthConfigured, isAuthenticated } from "@/lib/auth";
+import { AUTH_COOKIE_NAME, isPasswordAuthConfigured, isAuthenticated } from "./src/lib/auth";
 
 export async function middleware(request: NextRequest) {
   if (!isPasswordAuthConfigured()) {
